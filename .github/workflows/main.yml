@@ -1,0 +1,32 @@
+# Nom du workflow qui s'affichera dans l'interface GitHub
+name: CI - Build & Deploy
+
+# Déclenche le workflow à chaque push ou pull request sur la branche "main"
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# Définition des jobs (ici un seul job nommé "build")
+jobs:
+  build:
+    # Le job s'exécute sur une machine virtuelle Ubuntu
+    runs-on: ubuntu-latest
+
+    # Liste des étapes à exécuter
+    steps:
+      # Étape 1 : Cloner le dépôt (code source)
+      - name: Cloner le code
+        uses: actions/checkout@v3  # Action officielle pour récupérer le code
+
+      # Étape 2 : Vérifier la syntaxe HTML avec tidy
+      - name: Vérifier la syntaxe HTML (via tidy)
+        run: sudo apt-get install -y tidy && tidy -e index.html || true
+        # tidy vérifie les erreurs HTML dans index.html
+        # "|| true" permet au workflow de continuer même si tidy renvoie une erreur
+
+      # Étape 3 : Vérifier que le fichier index.html existe
+      - name: Vérifier que le fichier index.html existe
+        run: test -f index.html
+        # La commande "test -f" retourne une erreur si le fichier n'existe pas
